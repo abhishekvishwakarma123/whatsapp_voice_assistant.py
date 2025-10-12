@@ -1,4 +1,4 @@
-import time
+
 import pyttsx3
 import speech_recognition as sr
 from selenium import webdriver
@@ -86,3 +86,44 @@ def whatsapp_voice_assistant():
 
 # Run the assistant
 whatsapp_voice_assistant()
+
+import time
+
+def send_message_by_number(phone_number, message):
+    """Send a message to a phone number directly via WhatsApp Web."""
+    try:
+        # Load WhatsApp Web chat for given number
+        url = f"https://web.whatsapp.com/send?phone={phone_number}"
+        driver.get(url)
+        time.sleep(10)  # wait for chat to load
+
+        # Locate message input box and send
+        message_box = driver.find_element(By.XPATH, "//div[@contenteditable='true'][@title='Type a message']")
+        message_box.send_keys(message)
+        message_box.send_keys(Keys.ENTER)
+
+        speak(f"Message sent to {phone_number}")
+
+    except Exception as e:
+        speak("I couldn't send the message.")
+        print(e)
+
+def whatsapp_voice_assistant():
+    speak("Please tell the phone number with country code. For example, nine one nine eight...")
+
+    phone_number = listen().replace(" ", "").replace("-", "")
+    # Optional: Convert words to digits if necessary
+
+    speak(f"What message do you want to send to {phone_number}?")
+    message = listen()
+
+    send_message_by_number(phone_number, message)
+
+    speak("Would you like to send another message?")
+    response = listen()
+    if "yes" in response:
+        whatsapp_voice_assistant()
+    else:
+        speak("Okay, closing WhatsApp. Have a great day!")
+        driver.quit()
+
